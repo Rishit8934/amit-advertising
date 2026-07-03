@@ -1,9 +1,7 @@
-import express from "express";
+import type { IncomingMessage, ServerResponse } from "http";
 
-const app = express();
-
-app.get("/api/newspapers", (_req, res) => {
-  res.json([{ id: "test", name: "Express is working" }]);
-});
-
-export default app;
+export default function handler(req: IncomingMessage, res: ServerResponse) {
+  (res as any).setHeader("Content-Type", "application/json");
+  (res as any).statusCode = 200;
+  (res as any).end(JSON.stringify([{ id: "1", name: "Raw handler works!" }]));
+}
