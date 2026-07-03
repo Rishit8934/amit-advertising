@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>AdReach — Newspaper Advertising Simplified</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500&display=swap" rel="stylesheet"/>
+<script type="importmap">{"imports":{"lenis":"https://cdn.jsdelivr.net/npm/lenis@1.1.18/+esm"}}</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+img{display:block;max-width:100%}
+button{cursor:pointer;border:none;background:none;font:inherit}
+a{text-decoration:none;color:inherit}
+:root{
+  --bg:#ffffff;--fg:#0a0a0a;--brand:#2563c9;--brand-deep:#0f2f63;
+  --brand-light:#5790e6;--accent:#0b6e97;--surface:#f4f4f4;
+  --surface-card:#ffffff;--ink:#0a0a0a;--ink-soft:#717784;
+  --ghost:#d7dae1;--hairline:#e6e8ec;--on-brand:#ffffff;
+  --rc:1.5rem;--rcl:2rem;--rp:62.5rem;
+}
+:focus-visible{outline:2px solid var(--brand-light);outline-offset:2px}
+html{font-size:16px}
+@media(max-width:1920px){html{font-size:.833333vw}}
+@media(max-width:1440px){html{font-size:1.111111vw}}
+@media(max-width:1024px){html{font-size:1.5625vw}}
+@media(max-width:640px){html{font-size:4.444444vw}}
+body{min-height:100vh;background:var(--bg);color:var(--fg);font-family:"Onest",system-ui,sans-serif;font-weight:400}
+main{width:100%;overflow-x:clip;padding:.5rem}
+@media(min-width:640px){main{padding:.75rem}}
+
+/* ── LOADER ── */
+#loader{position:fixed;inset:0;z-index:200;background:var(--brand-deep);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;color:#fff}
+.loader-mark{display:flex;align-items:center;gap:.5rem;font-size:1.5rem;font-weight:500;text-transform:uppercase;letter-spacing:.2em;opacity:0;transform:translateY(1rem)}
+.loader-track{width:10rem;height:1px;background:rgba(255,255,255,.2);border-radius:var(--rp);overflow:hidden}
+.loader-fill{height:100%;background:#fff;transform:scaleX(0);transform-origin:left;transition:transform 1280ms cubic-bezier(.87,0,.13,1) 120ms}
+
+/* ── HEADER ── */
+header{position:absolute;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;padding:1.5rem 1.5rem 0;color:#fff;font-size:.75rem}
+@media(min-width:640px){header{padding:2rem 2.5rem 0}}
+.hdr-left{flex:1;display:none;gap:2rem}
+@media(min-width:1024px){.hdr-left{display:flex}}
+.hdr-left a{opacity:.9;transition:opacity .2s}
+.hdr-left a:hover{opacity:1}
+.hdr-center{flex:1;display:flex;justify-content:center;align-items:center;gap:.5rem;font-size:1rem;font-weight:500;text-transform:uppercase;letter-spacing:.2em}
+.hdr-right{flex:1;display:flex;justify-content:flex-end;align-items:center;gap:1rem}
+.btn-book-header{display:none;font-size:.75rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid rgba(255,255,255,.5);padding-bottom:1px}
+@media(min-width:640px){.btn-book-header{display:block}}
+.btn-book-header:hover{border-color:#fff}
+.burger{width:2.5rem;height:2.5rem;display:grid;place-items:center;border-radius:var(--rp);background:rgba(255,255,255,.15);backdrop-filter:blur(8px);flex-direction:column;gap:5px;transition:background .2s}
+.burger:hover{background:rgba(255,255,255,.25)}
+.burger-lines{display:flex;flex-direction:column;gap:5px}
+.burger-lines span{display:block;width:1rem;height:1px;background:#fff}
+
+/* ── HERO ── */
+.hero{position:relative;isolate:isolate;overflow:hidden;border-radius:var(--rcl);background:var(--brand-deep);color:#fff;display:flex;flex-direction:column;height:calc(100svh - 1rem);min-height:36rem}
+@media(min-width:640px){.hero{height:calc(100svh - 1.5rem)}}
+.hero-bg{position:absolute;inset:0;z-index:-10}
+.hero-plate{position:absolute;left:0;right:0;top:-16%;height:132%;width:100%}
+.hero-plate img{width:100%;height:100%;object-fit:cover}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(15,47,99,.72),rgba(15,47,99,.42),rgba(15,47,99,.82))}
+.hero-title{padding:1rem 1.5rem 0;font-size:12.5vw;font-weight:500;text-transform:uppercase;line-height:.85;letter-spacing:-.02em;white-space:nowrap;margin-top:auto;padding-top:0}
+@media(min-width:640px){.hero-title{padding-left:2.5rem;padding-right:2.5rem}}
+.hero-title-wrap{padding:1rem 1.5rem 0;margin-top:6rem}
+@media(min-width:640px){.hero-title-wrap{padding:1rem 2.5rem 0}}
+.word-clip{display:inline-block;overflow:hidden;padding-bottom:.12em;vertical-align:bottom}
+.word-inner{display:inline-block;transform:translateY(115%);opacity:0}
+.hero-bottom{margin-top:auto;padding:0 1.5rem 2rem;display:flex;flex-direction:column;gap:1.5rem}
+@media(min-width:640px){.hero-bottom{padding:0 2.5rem 2.5rem;flex-direction:row;justify-content:space-between;align-items:flex-end}}
+.tagline{font-size:2.4rem;font-weight:500;text-transform:uppercase;line-height:.95;letter-spacing:-.02em;color:rgba(255,255,255,.85)}
+.line-clip{display:block;overflow:hidden;padding-bottom:.14em}
+.line-inner{display:block;transform:translateY(115%);opacity:0}
+.hero-right{display:flex;align-items:flex-end;gap:1rem}
+/* Collection slider */
+.collection-slider{display:none;width:16rem;flex-direction:column;gap:.75rem;opacity:0;transform:translateY(1.75rem)}
+@media(min-width:768px){.collection-slider{display:flex}}
+.col-card{display:flex;align-items:center;gap:.75rem;border-radius:var(--rc);border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.1);padding:.75rem;backdrop-filter:blur(8px)}
+.col-thumb{width:3.5rem;height:3.5rem;border-radius:.75rem;object-fit:cover;flex-shrink:0}
+.col-info{flex:1;min-width:0}
+.col-brand{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em}
+.col-title{font-size:.7rem;text-transform:uppercase;opacity:.8;margin-top:.15rem}
+.col-cta{font-size:.65rem;border-bottom:1px solid rgba(255,255,255,.5);display:inline-block;margin-top:.25rem}
+.slider-dots{display:flex;gap:.5rem;padding:.1rem 0}
+.sdot{padding:.375rem;background:none;border:none;cursor:pointer}
+.sdot-pip{height:.375rem;border-radius:var(--rp);background:rgba(255,255,255,.4);transition:width .3s,background .3s}
+.sdot.active .sdot-pip{width:1.25rem;background:#fff}
+.sdot:not(.active) .sdot-pip{width:.375rem}
+/* Membership card */
+.membership-card{border-radius:var(--rc);border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.1);padding:.75rem;backdrop-filter:blur(8px);width:100%;max-width:20rem;display:flex;gap:.75rem;align-items:stretch;opacity:0;transform:translateY(1.75rem)}
+@media(min-width:640px){.membership-card{max-width:15rem}}
+.mc-left{display:flex;flex-direction:column;justify-content:space-between}
+.mc-big{font-size:1.875rem;font-weight:500;line-height:1}
+.mc-avatars{display:flex;margin-left:-.25rem}
+.mc-av{width:1.25rem;height:1.25rem;border-radius:var(--rp);border:1px solid rgba(15,47,99,.4);margin-left:-.25rem}
+.mc-caption{font-size:.65rem;opacity:.8;margin-top:.25rem}
+.mc-img{width:4rem;aspect-ratio:3/4;border-radius:.75rem;object-fit:cover;flex-shrink:0}
+
+/* ── TRUST ── */
+.trust{background:var(--bg);position:relative;overflow:hidden;padding:4rem 1.5rem}
+@media(min-width:640px){.trust{padding:5rem 2.5rem}}
+.trust-badges{position:relative;z-index:20;display:flex;flex-direction:column;gap:1.5rem}
+@media(min-width:640px){.trust-badges{flex-direction:row;justify-content:space-between;align-items:flex-start}}
+.pct-badge{width:7rem;height:7rem;border-radius:var(--rp);background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:.75rem;flex-shrink:0;opacity:0;transform:scale(.9)}
+@media(min-width:640px){.pct-badge{width:8rem;height:8rem}}
+.pct-val{font-size:1.5rem;font-weight:500}
+.pct-cap{font-size:.6rem;color:var(--ink-soft);max-width:7em;line-height:1.4;margin-top:.25rem}
+.trust-badge-card{max-width:28rem;background:var(--surface);border-radius:var(--rc);padding:1.25rem;display:flex;flex-direction:column;gap:.75rem;opacity:0;transform:translateY(1.5rem)}
+@media(min-width:640px){.trust-badge-card{padding:1.5rem;gap:1rem}}
+.badge-chip{display:inline-flex;background:var(--bg);border-radius:.75rem;padding:.5rem 1rem;font-size:1.25rem;font-weight:500;align-self:flex-start}
+.trust-badge-title{font-size:1.125rem;font-weight:500}
+.trust-badge-body{font-size:.75rem;color:var(--ink-soft);line-height:1.6}
+.ghost-heading{pointer-events:none;user-select:none;position:relative;z-index:0;margin-top:3rem;font-size:8.2vw;font-weight:500;text-transform:uppercase;line-height:1.02;letter-spacing:-.02em;max-width:88rem}
+.ghost-row{display:flex;justify-content:space-between}
+.ghost-word-ink{color:var(--ink)}
+.ghost-word-ghost{color:var(--ghost)}
+.coach-card-wrap{position:relative;z-index:10;display:flex;justify-content:center;margin-top:3rem}
+@media(min-width:640px){.coach-card-wrap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin-top:0}}
+.coach-card{width:13rem;transform:rotate(6deg);opacity:0;transform:rotate(6deg) translateY(3.75rem) scale(.92)}
+@media(min-width:640px){.coach-card{width:16rem}}
+.coach-fig{aspect-ratio:3/4;border-radius:var(--rc);background:var(--brand);overflow:hidden;position:relative}
+.coach-fig img{width:100%;height:100%;object-fit:cover}
+.coach-caption{position:absolute;inset-x:.75rem;bottom:.75rem;border-radius:.75rem;background:rgba(15,47,99,.4);backdrop-filter:blur(8px);color:#fff;padding:.5rem .75rem}
+.coach-name{font-size:.875rem;font-weight:500}
+.coach-role{font-size:.65rem;opacity:.8}
+.trust-controls{position:relative;z-index:20;display:flex;justify-content:space-between;align-items:center;margin-top:3rem}
+@media(min-width:640px){.trust-controls{margin-top:6rem}}
+
+/* ── PROGRAMS ── */
+.programs{background:var(--surface);padding:6rem 1.5rem}
+@media(min-width:640px){.programs{padding:6rem 2.5rem}}
+.section-head{margin-bottom:3.5rem}
+.prog-list{list-style:none;margin-top:3.5rem}
+.prog-item a{display:flex;align-items:center;gap:1.5rem;padding:1.75rem 0;border-top:1px solid var(--hairline);transition:background .2s;opacity:0;transform:translateY(1.625rem)}
+.prog-item:last-child a{border-bottom:1px solid var(--hairline)}
+.prog-idx{width:2.5rem;font-size:.875rem;font-weight:500;color:var(--ink-soft);flex-shrink:0}
+.prog-text{flex:1}
+.prog-name{font-size:1.5rem;font-weight:500;letter-spacing:-.02em;transition:color .2s}
+@media(min-width:640px){.prog-name{font-size:1.875rem}}
+.prog-desc{font-size:.875rem;color:var(--ink-soft);margin-top:.25rem}
+.prog-arrow{width:2.75rem;height:2.75rem;border-radius:var(--rp);border:1px solid var(--hairline);display:grid;place-items:center;flex-shrink:0}
+.prog-arrow svg{transition:transform .2s}
+.prog-item a:hover .prog-arrow svg{transform:translateX(.5rem)}
+
+/* ── FACILITIES ── */
+.facilities{background:var(--bg);border-radius:var(--rcl);margin-top:-2.5rem;padding:4rem 1.5rem 5rem}
+@media(min-width:640px){.facilities{padding:4rem 2.5rem 5rem}}
+.fac-grid{display:grid;grid-template-columns:1fr;gap:2.5rem;align-items:end;margin-top:2rem}
+@media(min-width:768px){.fac-grid{grid-template-columns:1fr 1fr}}
+.fac-icon{width:4rem;height:4rem;border-radius:var(--rc);object-fit:cover;opacity:0;transform:scale(.85)}
+.fac-body{font-size:.875rem;color:var(--ink-soft);max-width:20rem;margin-top:1.5rem;line-height:1.6}
+.fac-cards{display:flex;align-items:flex-end;gap:1.25rem}
+.fac-tile{flex:1;border-radius:var(--rc);overflow:hidden;background:var(--surface);aspect-ratio:3/4;position:relative;opacity:0;transform:translateY(3rem)}
+.fac-tile:nth-child(2){margin-bottom:2rem}
+.fac-tile img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.fac-tile:hover img{transform:scale(1.03)}
+.fac-caption{position:absolute;inset-x:.75rem;bottom:.75rem;border-radius:.75rem;backdrop-filter:blur(8px);color:#fff;padding:.75rem 1rem}
+.fac-caption.blue{background:rgba(11,110,151,.55)}
+.fac-caption.clay{background:rgba(15,47,99,.4)}
+.fac-cap-name{font-size:.875rem;font-weight:500}
+.fac-cap-desc{font-size:.65rem;opacity:.85;margin-top:.2rem}
+
+/* ── STATS ── */
+.stats{background:var(--brand-deep);color:#fff;border-radius:var(--rcl);margin-top:.75rem;padding:5rem 1.5rem}
+@media(min-width:640px){.stats{padding:5rem 2.5rem}}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem 2rem;margin-top:4rem}
+@media(min-width:1024px){.stats-grid{grid-template-columns:repeat(4,1fr)}}
+.stat-cell{border-top:1px solid rgba(255,255,255,.2);padding-top:1.25rem;opacity:0;transform:translateY(1.875rem)}
+.stat-val{font-size:3.75rem;font-weight:500;letter-spacing:-.02em;line-height:1}
+@media(min-width:640px){.stat-val{font-size:4.5rem}}
+.stat-label{font-size:.875rem;color:rgba(255,255,255,.65);margin-top:.75rem}
+
+/* ── TESTIMONIALS ── */
+.testimonials{background:var(--bg);padding:5rem 1.5rem}
+@media(min-width:640px){.testimonials{padding:6rem 2.5rem}}
+.test-grid{display:grid;grid-template-columns:1fr;gap:1.25rem;margin-top:3.5rem}
+@media(min-width:768px){.test-grid{grid-template-columns:repeat(3,1fr)}}
+.test-card{display:flex;flex-direction:column;justify-content:space-between;background:var(--surface);border-radius:var(--rc);padding:1.75rem;opacity:0;transform:translateY(2.5rem);transition:transform .3s}
+.test-quote{font-size:2.25rem;color:var(--brand);line-height:1}
+.test-text{font-size:1.125rem;line-height:1.6;color:var(--ink);margin-top:1rem}
+.test-author{border-top:1px solid var(--hairline);padding-top:1rem;margin-top:1.5rem}
+.test-name{font-weight:500}
+.test-role{font-size:.875rem;color:var(--ink-soft)}
+
+/* ── FOOTER ── */
+footer{background:var(--brand-deep);color:#fff;border-radius:var(--rcl);margin-top:.75rem;padding:3.5rem 1.5rem}
+@media(min-width:640px){footer{padding:4rem 2.5rem}}
+.footer-cta{border-bottom:1px solid rgba(255,255,255,.15);padding-bottom:3.5rem;display:flex;flex-direction:column;gap:1.5rem}
+@media(min-width:640px){.footer-cta{flex-direction:row;justify-content:space-between;align-items:flex-end}}
+.footer-cta-text{}
+.footer-play{font-size:3.75rem;font-weight:500;text-transform:uppercase;line-height:.92;letter-spacing:-.02em;margin-top:1rem}
+.footer-cols{display:grid;grid-template-columns:1fr;gap:2.5rem;padding:3.5rem 0}
+@media(min-width:768px){.footer-cols{grid-template-columns:1.4fr 1fr 1fr 1fr}}
+.footer-brand-name{display:flex;align-items:center;gap:.5rem;font-size:1.125rem;font-weight:500;text-transform:uppercase;letter-spacing:.2em}
+.footer-blurb{font-size:.875rem;color:rgba(255,255,255,.65);margin-top:1rem;line-height:1.6;max-width:20rem}
+address{font-style:normal;margin-top:1.5rem;font-size:.875rem;color:rgba(255,255,255,.8)}
+address a{display:block;margin-bottom:.25rem}
+address a:hover{color:#fff}
+.footer-muted{color:rgba(255,255,255,.55);font-size:.875rem}
+.footer-nav-head{font-size:.75rem;font-weight:500;text-transform:uppercase;letter-spacing:.2em;color:rgba(255,255,255,.5);margin-bottom:1rem}
+.footer-nav-list{list-style:none;display:flex;flex-direction:column;gap:.75rem}
+.footer-nav-list a{font-size:.875rem;color:rgba(255,255,255,.8)}
+.footer-nav-list a:hover{color:#fff}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.15);padding-top:2rem;display:flex;flex-direction:column;gap:1rem;align-items:center;text-align:center}
+@media(min-width:640px){.footer-bottom{flex-direction:row;justify-content:space-between;text-align:left}}
+.footer-bottom-text{font-size:.875rem;color:rgba(255,255,255,.6)}
+.social-nav,.legal-nav{display:flex;gap:1.25rem}
+.social-nav a,.legal-nav a{font-size:.875rem;color:rgba(255,255,255,.7)}
+.social-nav a:hover,.legal-nav a:hover{color:#fff}
+
+/* ── SHARED COMPONENTS ── */
+.eyebrow{display:inline-flex;align-items:center;gap:.5rem;font-size:.75rem;font-weight:500;text-transform:uppercase;letter-spacing:.22em}
+.eyebrow-dot{width:.375rem;height:.375rem;border-radius:var(--rp);flex-shrink:0}
+.eyebrow.dark{color:var(--ink-soft)}.eyebrow.dark .eyebrow-dot{background:var(--brand)}
+.eyebrow.light{color:rgba(255,255,255,.7)}.eyebrow.light .eyebrow-dot{background:var(--brand-light)}
+.pill-btn{display:inline-flex;align-items:center;gap:.5rem;border-radius:var(--rp);padding:.875rem 1.75rem;font-size:.875rem;font-weight:500;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;transition:background .2s,color .2s}
+.pill-btn.light{background:#fff;color:var(--brand-deep)}.pill-btn.light:hover{background:var(--brand-light);color:#fff}
+.pill-btn.solid{background:var(--ink);color:#fff}.pill-btn.solid:hover{background:var(--brand-deep)}
+.pill-btn.outline{border:1px solid currentColor;color:var(--ink)}.pill-btn.outline:hover{background:var(--ink);color:#fff}
+.arrow-btn{display:grid;place-items:center;border-radius:var(--rp);width:3rem;height:3rem;cursor:pointer;transition:background .2s,border-color .2s}
+@media(min-width:640px){.arrow-btn{width:3.5rem;height:3.5rem}}
+.arrow-btn.outline{border:1px solid var(--hairline);color:var(--ink);background:transparent}.arrow-btn.outline:hover{border-color:var(--ink)}
+.arrow-btn.solid{background:var(--ink);border:1px solid var(--ink);color:#fff}.arrow-btn.solid:hover{background:var(--brand-deep)}
+.arrow-btn svg{transition:transform .2s}
+.arrow-btn:hover svg{transform:scale(1.15)}
+.dots{display:flex;gap:.5rem}
+.dot{padding:.375rem;background:none;border:none;cursor:pointer}
+.dot-pip{height:.375rem;border-radius:var(--rp);transition:width .3s,background .3s}
+.dots.dark .dot.active .dot-pip{width:1.25rem;background:var(--ink)}
+.dots.dark .dot:not(.active) .dot-pip{width:.375rem;background:var(--ghost)}
+.dots.light .dot.active .dot-pip{width:1.25rem;background:#fff}
+.dots.light .dot:not(.active) .dot-pip{width:.375rem;background:rgba(255,255,255,.4)}
+
+/* ── MODAL ── */
+.modal-wrap{position:fixed;inset:0;z-index:90;display:flex;align-items:flex-end;justify-content:center;padding:.75rem;pointer-events:none}
+@media(min-width:640px){.modal-wrap{align-items:center;padding:1.5rem}}
+.modal-backdrop{position:absolute;inset:0;background:rgba(15,47,99,.4);backdrop-filter:blur(6px);opacity:0;transition:opacity .25s}
+.modal-panel{position:relative;z-index:1;background:var(--surface-card);border-radius:var(--rcl);padding:1.5rem;width:100%;max-height:92svh;overflow-y:auto;transform:translateY(1.75rem) scale(.96);opacity:0;transition:opacity .3s,transform .3s;box-shadow:0 24px 80px rgba(15,47,99,.25)}
+@media(min-width:640px){.modal-panel{max-width:32rem;padding:2rem}}
+.modal-open .modal-wrap{pointer-events:auto}
+.modal-open .modal-backdrop{opacity:1}
+.modal-open .modal-panel{opacity:1;transform:none}
+.modal-header{display:flex;justify-content:space-between;align-items:flex-start}
+.modal-close{width:2.5rem;height:2.5rem;border-radius:var(--rp);background:var(--surface);display:grid;place-items:center;flex-shrink:0}
+.modal-close:hover{background:var(--hairline)}
+.modal-close svg{transition:transform .25s}
+.modal-close:hover svg{transform:rotate(90deg)}
+.field-label{font-size:.75rem;font-weight:500;text-transform:uppercase;letter-spacing:.18em;color:var(--ink-soft);display:block;margin-bottom:.5rem}
+.field-input{width:100%;border-radius:.75rem;border:1px solid var(--hairline);background:var(--bg);padding:.75rem 1rem;font-size:.875rem;font-family:inherit;color:var(--ink)}
+.field-input:focus{outline:none;border-color:var(--brand-light);box-shadow:0 0 0 3px rgba(87,144,230,.15)}
+.modal-form{margin-top:1.75rem;display:flex;flex-direction:column;gap:1rem}
+.modal-submit{width:100%;border-radius:var(--rp);background:var(--ink);color:#fff;padding:.875rem 1.75rem;font-size:.875rem;font-weight:500;text-transform:uppercase;letter-spacing:.05em;transition:background .2s}
+.modal-submit:hover{background:var(--brand-deep)}
+.modal-submit:disabled{opacity:.5;cursor:not-allowed}
+.modal-success{margin-top:2rem;background:var(--surface);border-radius:var(--rc);padding:1.5rem;text-align:center;display:none}
+.success-icon{width:3rem;height:3rem;border-radius:var(--rp);background:var(--brand);display:grid;place-items:center;margin:0 auto 1rem}
+.success-title{font-size:1.125rem;font-weight:500;margin-bottom:.5rem}
+.success-text{font-size:.875rem;color:var(--ink-soft)}
+.success-done{margin-top:1rem}
+
+/* ── MENU ── */
+.menu-wrap{position:fixed;inset:0;z-index:70;display:flex;flex-direction:column;pointer-events:none}
+.menu-backdrop{position:absolute;inset:0;background:var(--brand-deep);opacity:0;transition:opacity .25s}
+.menu-panel{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;padding:.5rem;opacity:0;transform:translateY(-1.5rem);transition:opacity .3s,transform .3s}
+@media(min-width:640px){.menu-panel{padding:.75rem}}
+.menu-inner{flex:1;display:flex;flex-direction:column;padding:1.5rem}
+@media(min-width:640px){.menu-inner{padding:2.5rem}}
+.menu-open .menu-wrap{pointer-events:auto}
+.menu-open .menu-backdrop{opacity:1}
+.menu-open .menu-panel{opacity:1;transform:none}
+.menu-top{display:flex;justify-content:space-between;align-items:center;color:#fff}
+.menu-brand{display:flex;align-items:center;gap:.5rem;font-size:1.125rem;font-weight:500;text-transform:uppercase;letter-spacing:.2em}
+.menu-close{width:2.5rem;height:2.5rem;border-radius:var(--rp);background:rgba(255,255,255,.15);display:grid;place-items:center;color:#fff}
+.menu-close:hover{background:rgba(255,255,255,.25)}
+.menu-close svg{transition:transform .25s}
+.menu-close:hover svg{transform:rotate(90deg)}
+.menu-nav{flex:1;display:flex;flex-direction:column;justify-content:center;gap:.5rem;color:#fff}
+.menu-link{display:block;font-size:3rem;font-weight:500;letter-spacing:-.02em;line-height:1.1;opacity:0;transform:translateY(1.75rem);transition:color .2s}
+@media(min-width:640px){.menu-link{font-size:4.5rem}}
+.menu-link:hover{color:var(--brand-light)}
+.menu-bottom{border-top:1px solid rgba(255,255,255,.15);padding-top:2rem;display:flex;flex-direction:column;gap:1rem;color:#fff}
+@media(min-width:640px){.menu-bottom{flex-direction:row;justify-content:space-between;align-items:center}}
+.menu-social{display:flex;gap:1.25rem}
+.menu-social a{font-size:.875rem;color:rgba(255,255,255,.7)}
+.menu-social a:hover{color:#fff}
+/* newspaper watermark bg for hero */
+.hero-newsprint{position:absolute;inset:0;z-index:-5;opacity:.04;font-size:2rem;font-weight:700;color:#fff;line-height:1.2;overflow:hidden;pointer-events:none;user-select:none;word-break:break-all;padding:1rem}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-mark" id="loader-mark">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <rect x="3" y="3" width="18" height="18" rx="2"/>
+      <line x1="3" y1="8" x2="21" y2="8"/>
+      <line x1="3" y1="13" x2="21" y2="13"/>
+      <line x1="8" y1="8" x2="8" y2="21"/>
+    </svg>
+    AdReach
+  </div>
+  <div class="loader-track"><div class="loader-fill" id="loader-fill"></div></div>
+</div>
+
+<!-- CONTACT MODAL -->
+<div class="modal-wrap" id="modal">
+  <div class="modal-backdrop" id="modal-backdrop"></div>
+  <div class="modal-panel" role="dialog" aria-modal="true" id="modal-panel">
+    <div class="modal-header">
+      <div>
+        <div class="eyebrow dark"><span class="eyebrow-dot"></span>Book a campaign</div>
+        <div style="font-size:2.25rem;font-weight:500;line-height:.95;letter-spacing:-.02em;margin-top:.75rem">
+          <div class="line-clip"><span class="line-inner" id="m-l1">Start Your</span></div>
+          <div class="line-clip"><span class="line-inner" id="m-l2">Campaign</span></div>
+        </div>
+      </div>
+      <button class="modal-close" id="modal-close" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <form class="modal-form" id="modal-form" novalidate>
+      <div><label class="field-label" for="f-name">Full name</label><input class="field-input" id="f-name" type="text" placeholder="Rahul Sharma" autocomplete="name"/></div>
+      <div><label class="field-label" for="f-email">Email</label><input class="field-input" id="f-email" type="email" placeholder="you@company.com" autocomplete="email"/></div>
+      <div><label class="field-label" for="f-msg">What would you like to advertise?</label><textarea class="field-input" id="f-msg" rows="3" placeholder="I'd like to book a classified ad in The Tribune for our property listing…"></textarea></div>
+      <button type="submit" class="modal-submit" id="modal-submit">Request a callback</button>
+    </form>
+    <div class="modal-success" id="modal-success">
+      <div class="success-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg></div>
+      <div class="success-title">Request received</div>
+      <p class="success-text" id="success-msg">Thanks — our team will be in touch to plan your campaign.</p>
+      <button class="pill-btn solid success-done" id="modal-done">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- MENU OVERLAY -->
+<div class="menu-wrap" id="menu">
+  <div class="menu-backdrop" id="menu-backdrop"></div>
+  <div class="menu-panel">
+    <div class="menu-inner">
+      <div class="menu-top">
+        <div class="menu-brand">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="8" x2="21" y2="8"/><line x1="3" y1="13" x2="21" y2="13"/><line x1="8" y1="8" x2="8" y2="21"/></svg>
+          AdReach
+        </div>
+        <button class="menu-close" id="menu-close" aria-label="Close menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <nav class="menu-nav" aria-label="Main">
+        <a href="#programs" class="menu-link" data-menu-link>Ad Formats</a>
+        <a href="#facilities" class="menu-link" data-menu-link>Newspapers</a>
+        <a href="#testimonials" class="menu-link" data-menu-link>Reviews</a>
+        <a href="#contact" class="menu-link" data-menu-link>Contact</a>
+      </nav>
+      <div class="menu-bottom">
+        <button class="pill-btn light" id="menu-book">Book a Campaign <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <div class="menu-social">
+          <a href="#instagram">Instagram</a><a href="#x">X</a><a href="#youtube">YouTube</a><a href="#linkedin">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main>
+<!-- ── HERO ── -->
+<section class="hero" id="hero">
+  <div class="hero-bg">
+    <div class="hero-plate" id="hero-plate">
+      <img src="https://api.getlayers.ai/storage/v1/object/public/public/assets/baseline-88535e4000/hero/hero-court.webp" alt="Newspaper printing press in action" fetchpriority="high" loading="eager"/>
+      <div class="hero-overlay"></div>
+    </div>
+    <!-- Newsprint watermark -->
+    <div class="hero-newsprint">CLASSIFIED DISPLAY RECRUITMENT MATRIMONIAL PROPERTY TENDER NOTICE OBITUARY ANNOUNCEMENT CLASSIFIED DISPLAY RECRUITMENT MATRIMONIAL PROPERTY TENDER NOTICE OBITUARY ANNOUNCEMENT CLASSIFIED DISPLAY RECRUITMENT</div>
+  </div>
+
+  <header>
+    <nav class="hdr-left" aria-label="Primary">
+      <a href="#programs">Ad Formats</a>
+      <a href="#facilities">Newspapers</a>
+    </nav>
+    <div class="hdr-center">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="8" x2="21" y2="8"/><line x1="3" y1="13" x2="21" y2="13"/><line x1="8" y1="8" x2="8" y2="21"/></svg>
+      AdReach
+    </div>
+    <div class="hdr-right">
+      <button class="btn-book-header" id="hdr-book">Book a Campaign</button>
+      <button class="burger" id="burger-btn" aria-label="Open menu">
+        <div class="burger-lines"><span></span><span></span></div>
+      </button>
+    </div>
+  </header>
+
+  <div class="hero-title-wrap">
+    <h1 id="hero-title" style="font-size:12.5vw;font-weight:500;text-transform:uppercase;line-height:.85;letter-spacing:-.02em;white-space:nowrap"></h1>
+  </div>
+
+  <div class="hero-bottom">
+    <div class="tagline" id="hero-tagline">
+      <div class="line-clip"><span class="line-inner">Book Smart,</span></div>
+      <div class="line-clip"><span class="line-inner">Advertise Bold</span></div>
+    </div>
+    <div class="hero-right">
+      <!-- Collection slider (newspaper editions) -->
+      <div class="collection-slider" id="collection-slider">
+        <div class="col-card" id="col-card">
+          <img class="col-thumb" id="col-img" src="" alt=""/>
+          <div class="col-info">
+            <div class="col-brand" id="col-brand"></div>
+            <div class="col-title" id="col-title"></div>
+            <span class="col-cta" id="col-cta"></span>
+          </div>
+        </div>
+        <div class="slider-dots" id="slider-dots"></div>
+      </div>
+      <!-- Membership card -->
+      <article class="membership-card" id="membership-card">
+        <div class="mc-left">
+          <div class="mc-big">68+</div>
+          <div>
+            <div class="mc-avatars">
+              <div class="mc-av" style="background:#5790e6"></div>
+              <div class="mc-av" style="background:#c2e029"></div>
+              <div class="mc-av" style="background:#0b6e97"></div>
+              <div class="mc-av" style="background:#fff"></div>
+            </div>
+            <div class="mc-caption">Newspapers on network</div>
+          </div>
+        </div>
+        <img class="mc-img" src="https://api.getlayers.ai/storage/v1/object/public/public/assets/baseline-88535e4000/1.webp" alt="Advertiser reviewing newspaper campaign" loading="lazy"/>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ── TRUST ── -->
+<section class="trust" id="trust" style="margin-top:.75rem">
+  <div class="trust-badges">
+    <div class="pct-badge" id="pct-badge">
+      <div class="pct-val">100%</div>
+      <div class="pct-cap">Online booking with instant confirmation</div>
+    </div>
+    <article class="trust-badge-card" id="trust-badge-card">
+      <div class="badge-chip">#01</div>
+      <div class="trust-badge-title">Trusted by serious advertisers</div>
+      <p class="trust-badge-body">From first-time classified bookers to national brands running multi-edition campaigns, advertisers choose AdReach because the results show up in responses.</p>
+    </article>
+  </div>
+
+  <h2 class="ghost-heading" id="trust-title" aria-hidden="true">
+    <div class="ghost-row">
+      <span class="ghost-word word-clip" data-ghost="0"><span class="word-inner"></span></span>
+      <span class="ghost-word word-clip" data-ghost="1"><span class="word-inner"></span></span>
+    </div>
+    <div class="ghost-row">
+      <span class="ghost-word word-clip" data-ghost="2"><span class="word-inner"></span></span>
+      <span class="ghost-word word-clip" data-ghost="3"><span class="word-inner"></span></span>
+    </div>
+  </h2>
+
+  <div class="coach-card-wrap">
+    <figure class="coach-card" id="coach-card" style="transform:rotate(6deg)">
+      <div class="coach-fig">
+        <img id="coach-img" src="" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover"/>
+        <div class="coach-caption">
+          <div class="coach-name" id="coach-name"></div>
+          <div class="coach-role" id="coach-role"></div>
+        </div>
+      </div>
+    </figure>
+  </div>
+
+  <div class="trust-controls">
+    <button class="arrow-btn outline" id="trust-prev" aria-label="Previous">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="transform:scaleX(-1)"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+    <div class="dots dark" id="trust-dots"></div>
+    <button class="arrow-btn solid" id="trust-next" aria-label="Next">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+  </div>
+</section>
+
+<!-- ── PROGRAMS ── -->
+<section class="programs" id="programs" style="margin-top:.75rem">
+  <div class="section-head">
+    <div class="eyebrow dark"><span class="eyebrow-dot"></span>Ad formats</div>
+    <h2 id="programs-title" style="font-size:3rem;font-weight:500;line-height:.95;letter-spacing:-.02em;margin-top:1rem">
+      <div class="line-clip"><span class="line-inner">Built for</span></div>
+      <div class="line-clip"><span class="line-inner">every budget</span></div>
+    </h2>
+  </div>
+  <ul class="prog-list" id="prog-list">
+    <li class="prog-item"><a href="#classified-text">
+      <span class="prog-idx">01</span>
+      <div class="prog-text"><div class="prog-name">Classified Text</div><div class="prog-desc">Word-based ads for matrimonial, recruitment, property, and more.</div></div>
+      <div class="prog-arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+    </a></li>
+    <li class="prog-item"><a href="#classified-display">
+      <span class="prog-idx">02</span>
+      <div class="prog-text"><div class="prog-name">Classified Display</div><div class="prog-desc">Box ads with images and custom design — maximum visual impact.</div></div>
+      <div class="prog-arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+    </a></li>
+    <li class="prog-item"><a href="#display">
+      <span class="prog-idx">03</span>
+      <div class="prog-text"><div class="prog-name">Display Ads</div><div class="prog-desc">Full-page, half-page, and quarter-page ads across premium newspapers.</div></div>
+      <div class="prog-arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+    </a></li>
+    <li class="prog-item"><a href="#packages">
+      <span class="prog-idx">04</span>
+      <div class="prog-text"><div class="prog-name">Multi-Edition Packages</div><div class="prog-desc">Book across 5, 10, or all editions in one click — best value rates.</div></div>
+      <div class="prog-arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+    </a></li>
+  </ul>
+</section>
+
+<!-- ── FACILITIES (Newspapers) ── -->
+<section class="facilities" id="facilities">
+  <div class="fac-grid">
+    <div style="max-width:24rem">
+      <img class="fac-icon" id="fac-icon" src="https://api.getlayers.ai/storage/v1/object/public/public/assets/baseline-88535e4000/3.webp" alt="Newspaper front page close-up" loading="lazy"/>
+      <h2 id="facilities-title" style="font-size:3rem;font-weight:500;line-height:.95;letter-spacing:-.02em;margin-top:1.5rem">
+        <div class="line-clip"><span class="line-inner">Browse Our</span></div>
+        <div class="line-clip"><span class="line-inner">Newspaper</span></div>
+        <div class="line-clip"><span class="line-inner">Network</span></div>
+      </h2>
+      <p class="fac-body" id="fac-body">Choose from 68+ daily and weekly newspapers across India — from national heavyweights to regional editions — and reach your exact audience, wherever they are.</p>
+    </div>
+    <div class="fac-cards">
+      <figure class="fac-tile" id="fac-tile-0">
+        <img src="https://api.getlayers.ai/storage/v1/object/public/public/assets/baseline-88535e4000/1.webp" alt="English national newspapers" loading="lazy" style="width:100%;height:100%;object-fit:cover"/>
+        <figcaption class="fac-caption clay">
+          <div class="fac-cap-name">National Dailies</div>
+          <div class="fac-cap-desc">TOI, HT, The Hindu, Indian Express &amp; more.</div>
+        </figcaption>
+      </figure>
+      <figure class="fac-tile" id="fac-tile-1">
+        <img src="https://api.getlayers.ai/storage/v1/object/public/public/assets/baseline-88535e4000/4.webp" alt="Regional language newspapers" loading="lazy" style="width:100%;height:100%;object-fit:cover"/>
+        <figcaption class="fac-caption blue">
+          <div class="fac-cap-name">Regional Press</div>
+          <div class="fac-cap-desc">Dainik Jagran, Amar Ujala, Tribune &amp; 50+ more.</div>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ── STATS ── -->
+<section class="stats" id="stats">
+  <div class="eyebrow light"><span class="eyebrow-dot"></span>By the numbers</div>
+  <h2 id="stats-title" style="font-size:3rem;font-weight:500;line-height:.95;letter-spacing:-.02em;margin-top:1rem">
+    <div class="line-clip"><span class="line-inner">A network that</span></div>
+    <div class="line-clip"><span class="line-inner">keeps delivering</span></div>
+  </h2>
+  <dl class="stats-grid">
+    <div class="stat-cell"><dd class="stat-val">68+</dd><dt class="stat-label">Newspapers on platform</dt></div>
+    <div class="stat-cell"><dd class="stat-val">500+</dd><dt class="stat-label">City editions covered</dt></div>
+    <div class="stat-cell"><dd class="stat-val">10K+</dd><dt class="stat-label">Campaigns booked</dt></div>
+    <div class="stat-cell"><dd class="stat-val">15</dd><dt class="stat-label">Years of media expertise</dt></div>
+  </dl>
+</section>
+
+<!-- ── TESTIMONIALS ── -->
+<section class="testimonials" id="testimonials">
+  <div class="eyebrow dark"><span class="eyebrow-dot"></span>What advertisers say</div>
+  <h2 id="testimonials-title" style="font-size:3rem;font-weight:500;line-height:.95;letter-spacing:-.02em;margin-top:1rem">
+    <div class="line-clip"><span class="line-inner">Loved by</span></div>
+    <div class="line-clip"><span class="line-inner">our clients</span></div>
+  </h2>
+  <ul class="test-grid">
+    <li><article class="test-card inview-test">
+      <div class="test-quote">"</div>
+      <blockquote class="test-text">We booked Tribune classified ads for 3 cities in under 5 minutes. The response rate was the best we've seen in years.</blockquote>
+      <figcaption class="test-author"><div class="test-name">Priya Anand</div><div class="test-role">Marketing Head, PropTech Startup</div></figcaption>
+    </article></li>
+    <li><article class="test-card inview-test">
+      <div class="test-quote">"</div>
+      <blockquote class="test-text">Best rates, instant booking, and real confirmation. AdReach made our recruitment campaign completely stress-free.</blockquote>
+      <figcaption class="test-author"><div class="test-name">Lukas Brenner</div><div class="test-role">HR Director, Logistics Corp</div></figcaption>
+    </article></li>
+    <li><article class="test-card inview-test">
+      <div class="test-quote">"</div>
+      <blockquote class="test-text">I placed a matrimonial ad across five newspapers at once. Couldn't believe how simple it was — and so much cheaper than calling agents.</blockquote>
+      <figcaption class="test-author"><div class="test-name">Dana Okafor</div><div class="test-role">Private Advertiser</div></figcaption>
+    </article></li>
+  </ul>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer id="contact">
+  <div class="footer-cta">
+    <div class="footer-cta-text">
+      <div class="eyebrow light"><span class="eyebrow-dot"></span>Get started</div>
+      <div class="footer-play">
+        <div class="line-clip"><span class="line-inner">Ready to</span></div>
+        <div class="line-clip"><span class="line-inner">go to print?</span></div>
+      </div>
+    </div>
+    <button class="pill-btn light inview-footer-btn" id="footer-book">
+      Book a Campaign
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+  </div>
+  <div class="footer-cols">
+    <div>
+      <div class="footer-brand-name">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="8" x2="21" y2="8"/><line x1="3" y1="13" x2="21" y2="13"/><line x1="8" y1="8" x2="8" y2="21"/></svg>
+        AdReach
+      </div>
+      <p class="footer-blurb">A newspaper advertising platform where instant booking meets the lowest rates across 68+ publications.</p>
+      <address>
+        <a href="mailto:ads@adreach.in">ads@adreach.in</a>
+        <a href="tel:+919830629298">+91 98306 29298</a>
+        <span class="footer-muted">Amit Advertising, New Delhi</span>
+      </address>
+    </div>
+    <nav aria-label="Ad formats">
+      <div class="footer-nav-head">Ad Formats</div>
+      <ul class="footer-nav-list">
+        <li><a href="#classified-text">Classified Text</a></li>
+        <li><a href="#classified-display">Classified Display</a></li>
+        <li><a href="#display">Display Ads</a></li>
+        <li><a href="#packages">Multi-Edition</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Newspapers">
+      <div class="footer-nav-head">Newspapers</div>
+      <ul class="footer-nav-list">
+        <li><a href="#tribune">The Tribune</a></li>
+        <li><a href="#toi">Times of India</a></li>
+        <li><a href="#ht">Hindustan Times</a></li>
+        <li><a href="#facilities">All 68+ Papers</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Company">
+      <div class="footer-nav-head">Company</div>
+      <ul class="footer-nav-list">
+        <li><a href="#about">About</a></li>
+        <li><a href="#rates">Rate Cards</a></li>
+        <li><a href="#careers">Careers</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-bottom-text">© 2026 AdReach / Amit Advertising. All rights reserved.</p>
+    <nav class="social-nav" aria-label="Social"><a href="#instagram">Instagram</a><a href="#x">X</a><a href="#youtube">YouTube</a><a href="#linkedin">LinkedIn</a></nav>
+    <nav class="legal-nav" aria-label="Legal"><a href="#privacy">Privacy</a><a href="#terms">Terms</a></nav>
+  </div>
+</footer>
+</main>
+
+<script type="module">
+import Lenis from 'lenis';
+
+// ── LENIS ──────────────────────────────────────────────────────────
+const lenis = new Lenis({ smoothWheel: true });
+function raf(t){ lenis.raf(t); requestAnimationFrame(raf); }
+requestAnimationFrame(raf);
+window.scrollTo(0,0);
+
+function lockScroll(){ lenis.stop(); document.documentElement.style.cssText += ';position:relative;overflow:hidden;height:100%'; }
+function unlockScroll(){ lenis.start(); document.documentElement.style.removeProperty('position'); document.documentElement.style.removeProperty('overflow'); document.documentElement.style.removeProperty('height'); }
+
+// ── ADAPTIVE FONT SCALE ────────────────────────────────────────────
+const FONT_BASE=16, BASE_W=1920, COEF=.6666;
+function scaleFont(){
+  if(innerWidth<=1920){ document.documentElement.style.removeProperty('font-size'); return; }
+  const r=((BASE_W-innerWidth)/BASE_W)*100*COEF;
+  const s=FONT_BASE-(FONT_BASE*r)/100;
+  if(s>FONT_BASE) document.documentElement.style.fontSize=s+'px';
+  else document.documentElement.style.removeProperty('font-size');
+}
+scaleFont(); addEventListener('resize', scaleFont);
+
+// ── EASING FUNCTIONS ───────────────────────────────────────────────
+const easeOutExpo = t => t===1?1:1-Math.pow(2,-10*t);
+const easeOutQuart = t => 1-Math.pow(1-t,4);
+const easeInOutCubic = t => t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+
+// ── TWEEN HELPER ───────────────────────────────────────────────────
+function tween(duration, ease, onUpdate, onDone){
+  const start = performance.now();
+  function step(now){
+    const p = Math.min((now-start)/duration, 1);
+    onUpdate(ease(p));
+    if(p<1) requestAnimationFrame(step);
+    else if(onDone) onDone();
+  }
+  requestAnimationFrame(step);
+}
+
+// ── SPRING HELPER ──────────────────────────────────────────────────
+function createSpring(tension=200, friction=26){
+  let x=0, v=0, target=0;
+  return {
+    setTarget(t){ target=t; },
+    setVal(val){ x=val; v=0; },
+    step(dt){
+      const dt2=Math.min(dt,50)/1000;
+      v += (-tension*(x-target)-friction*v)*dt2;
+      x += v*dt2;
+      return x;
+    },
+    get(){ return x; },
+    isDone(){ return Math.abs(x-target)<.001 && Math.abs(v)<.001; }
+  };
+}
+
+// ── WORD CLIP REVEAL ───────────────────────────────────────────────
+function revealWords(el, stagger=140, duration=1100, delay=0, ease=easeOutExpo){
+  if(!el) return;
+  const text = el.dataset.text || el.textContent;
+  el.innerHTML='';
+  text.split(' ').forEach((w,i)=>{
+    const clip=document.createElement('span');
+    clip.style.cssText='display:inline-block;overflow:hidden;padding-bottom:.12em;vertical-align:bottom';
+    const inner=document.createElement('span');
+    inner.style.cssText='display:inline-block;transform:translateY(115%);opacity:0';
+    inner.textContent=w+' ';
+    clip.appendChild(inner);
+    el.appendChild(clip);
+    setTimeout(()=>{
+      tween(duration, ease, p=>{
+        inner.style.transform=`translateY(${115*(1-p)}%)`;
+        inner.style.opacity=p;
+      });
+    }, delay + i*stagger);
+  });
+}
+
+// ── LINE CLIP REVEAL ───────────────────────────────────────────────
+function revealLines(container, stagger=120, delay=0, duration=950, ease=easeOutExpo){
+  if(!container) return;
+  const inners = container.querySelectorAll('.line-inner');
+  inners.forEach((el,i)=>{
+    el.style.transform='translateY(115%)';
+    el.style.opacity='0';
+    setTimeout(()=>{
+      tween(duration, ease, p=>{
+        el.style.transform=`translateY(${115*(1-p)}%)`;
+        el.style.opacity=String(p);
+      });
+    }, delay + i*stagger);
+  });
+}
+
+// ── INVIEW OBSERVER ────────────────────────────────────────────────
+function inview(el, fromY=28, delay=0, tension=200, friction=26, fromScale=1, toScale=1, fromOpacity=0){
+  if(!el) return;
+  el.style.opacity=String(fromOpacity);
+  el.style.transform=`translateY(${fromY}px) scale(${fromScale})`;
+  const obs = new IntersectionObserver(entries=>{
+    if(!entries[0].isIntersecting) return;
+    obs.disconnect();
+    setTimeout(()=>{
+      const sp_y = createSpring(tension, friction);
+      const sp_s = createSpring(tension, friction);
+      sp_y.setVal(fromY); sp_s.setVal(fromScale);
+      sp_y.setTarget(0); sp_s.setTarget(toScale);
+      let op=fromOpacity, lastT=performance.now();
+      function animate(now){
+        const dt=now-lastT; lastT=now;
+        const y=sp_y.step(dt), s=sp_s.step(dt);
+        op=Math.min(op+dt/300, 1);
+        el.style.opacity=String(op);
+        el.style.transform=`translateY(${y}px) scale(${s})`;
+        if(!sp_y.isDone()||!sp_s.isDone()||op<1) requestAnimationFrame(animate);
+      }
+      requestAnimationFrame(animate);
+    }, delay);
+  }, { threshold:.15 });
+  obs.observe(el);
+}
+
+// ── DATA ───────────────────────────────────────────────────────────
+const BASE = 'https://api.getlayers.ai/storage/v1/object/public/public/assets/baseline-88535e4000';
+const colSlides = [
+  { img:`${BASE}/2.webp`, brand:'Tribune Group', title:'Classified Text', cta:'Book now →', alt:'Tribune newspaper' },
+  { img:`${BASE}/3.webp`, brand:'TOI Network', title:'Display Ads', cta:'View rates →', alt:'Times of India' },
+  { img:`${BASE}/5.webp`, brand:'Regional Press', title:'Hindi Editions', cta:'Explore papers →', alt:'Regional newspaper' }
+];
+const trustSlides = [
+  { headline:['Reach','The','Right','Readers'], img:`${BASE}/5.webp`, name:'Deepak Verma', role:'Senior Media Consultant', alt:'Media consultant' },
+  { headline:['Lowest','Rates','Guaranteed','Online'], img:`${BASE}/4.webp`, name:'Sunita Rao', role:'Digital Ad Strategist', alt:'Ad strategist' },
+  { headline:['Instant','Booking','Print','Tomorrow'], img:`${BASE}/1.webp`, name:'Arjun Mehta', role:'Classified Ad Specialist', alt:'Classified specialist' }
+];
+
+// ── LOADER ────────────────────────────────────────────────────────
+const loader = document.getElementById('loader');
+const loaderMark = document.getElementById('loader-mark');
+const loaderFill = document.getElementById('loader-fill');
+const prefersReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const MIN_MS = prefersReduced ? 200 : 1400;
+const EXIT_MS = prefersReduced ? 50 : 850;
+let ready = false;
+
+lockScroll();
+setTimeout(()=>{ loaderMark.style.transition='opacity .5s,transform .5s'; loaderMark.style.opacity='1'; loaderMark.style.transform='none'; }, 80);
+requestAnimationFrame(()=>requestAnimationFrame(()=>{ loaderFill.style.transform='scaleX(1)'; }));
+
+function triggerReady(){
+  if(ready) return; ready=true;
+  unlockScroll();
+  // hero reveal
+  const titleEl = document.getElementById('hero-title');
+  titleEl.dataset.text = 'REACH MILLIONS';
+  revealWords(titleEl, 140, 1100, 0, easeOutExpo);
+  revealLines(document.getElementById('hero-tagline'), 110, 350, 900, easeOutExpo);
+  // collection slider fade in
+  setTimeout(()=>{
+    const cs = document.getElementById('collection-slider');
+    cs.style.transition='opacity .6s,transform .6s';
+    cs.style.opacity='1'; cs.style.transform='none';
+    initSlider();
+  }, 650);
+  // membership card
+  setTimeout(()=>{
+    const mc = document.getElementById('membership-card');
+    mc.style.transition='opacity .6s,transform .6s';
+    mc.style.opacity='1'; mc.style.transform='none';
+  }, 780);
+  // slide curtain up
+  tween(EXIT_MS, easeInOutCubic, p=>{
+    loader.style.transform=`translateY(${-105*p}%)`;
+  }, ()=>{ loader.remove(); });
+}
+
+const forceTimer = setTimeout(triggerReady, 2600);
+if(document.readyState==='complete'){ clearTimeout(forceTimer); setTimeout(triggerReady, MIN_MS); }
+else { window.addEventListener('load',()=>{ clearTimeout(forceTimer); setTimeout(triggerReady, MIN_MS); }, {once:true}); }
+
+// ── COLLECTION SLIDER ─────────────────────────────────────────────
+let colIdx=0, colTimer=null;
+function initSlider(){
+  const dots = document.getElementById('slider-dots');
+  dots.innerHTML='';
+  colSlides.forEach((_,i)=>{
+    const b=document.createElement('button');
+    b.className='sdot'+(i===0?' active':'');
+    b.innerHTML='<span class="sdot-pip"></span>';
+    b.addEventListener('click',()=>goSlide(i));
+    dots.appendChild(b);
+  });
+  setSlide(0);
+  colTimer=setInterval(()=>goSlide((colIdx+1)%colSlides.length), 3800);
+}
+function setSlide(i){
+  colIdx=i;
+  const s=colSlides[i];
+  document.getElementById('col-img').src=s.img;
+  document.getElementById('col-img').alt=s.alt;
+  document.getElementById('col-brand').textContent=s.brand;
+  document.getElementById('col-title').textContent=s.title;
+  document.getElementById('col-cta').textContent=s.cta;
+  document.querySelectorAll('.sdot').forEach((d,j)=>d.classList.toggle('active',j===i));
+}
+function goSlide(i){
+  clearInterval(colTimer);
+  const card=document.getElementById('col-card');
+  card.style.transition='opacity .25s,transform .25s';
+  card.style.opacity='0'; card.style.transform='translateY(1rem) scale(.96)';
+  setTimeout(()=>{ setSlide(i); card.style.opacity='1'; card.style.transform='none'; }, 250);
+  colTimer=setInterval(()=>goSlide((colIdx+1)%colSlides.length), 3800);
+}
+
+// ── HERO PARALLAX ─────────────────────────────────────────────────
+const heroSection = document.getElementById('hero');
+const heroPlate = document.getElementById('hero-plate');
+lenis.on('scroll', ({scroll})=>{
+  const h=heroSection.offsetHeight;
+  const p=Math.min(Math.max(scroll/h, 0), 1);
+  heroPlate.style.transform=`translateY(${p*12}%)`;
+});
+
+// ── TRUST SECTION ─────────────────────────────────────────────────
+let trustIdx=0;
+const ghostWords = [document.querySelector('[data-ghost="0"] .word-inner'), document.querySelector('[data-ghost="1"] .word-inner'), document.querySelector('[data-ghost="2"] .word-inner'), document.querySelector('[data-ghost="3"] .word-inner')];
+const ghostClips = document.querySelectorAll('.ghost-word');
+const ghostColors = [false, false, true, false]; // index 2 = ink
+
+function setTrustSlide(i, animate=true){
+  trustIdx=i;
+  const s=trustSlides[i];
+  // ghost words
+  ghostClips.forEach((clip,j)=>{
+    const inner=ghostWords[j];
+    inner.textContent=s.headline[j];
+    clip.style.color = ghostColors[j] ? 'var(--ink)' : 'var(--ghost)';
+    if(animate){
+      inner.style.transform='translateY(115%)'; inner.style.opacity='0';
+      setTimeout(()=>{
+        tween(700, easeOutExpo, p=>{
+          inner.style.transform=`translateY(${115*(1-p)}%)`;
+          inner.style.opacity=String(p);
+        });
+      }, j*100);
+    } else {
+      inner.style.transform='none'; inner.style.opacity='1';
+    }
+  });
+  // coach photo
+  const img=document.getElementById('coach-img');
+  const name=document.getElementById('coach-name');
+  const role=document.getElementById('coach-role');
+  name.textContent=s.name; role.textContent=s.role;
+  if(animate){
+    img.style.opacity='0';
+    setTimeout(()=>{ img.src=s.img; img.alt=s.alt; img.style.transition='opacity .35s'; img.style.opacity='1'; }, 100);
+  } else { img.src=s.img; img.alt=s.alt; img.style.opacity='1'; }
+  // dots
+  document.querySelectorAll('#trust-dots .dot').forEach((d,j)=>d.classList.toggle('active',j===i));
+}
+
+// Build trust dots
+const trustDotsEl = document.getElementById('trust-dots');
+trustSlides.forEach((_,i)=>{
+  const b=document.createElement('button');
+  b.className='dot'+(i===0?' active':'');
+  b.innerHTML='<span class="dot-pip"></span>';
+  b.addEventListener('click',()=>setTrustSlide(i));
+  trustDotsEl.appendChild(b);
+});
+document.getElementById('trust-prev').addEventListener('click',()=>setTrustSlide((trustIdx-1+trustSlides.length)%trustSlides.length));
+document.getElementById('trust-next').addEventListener('click',()=>setTrustSlide((trustIdx+1)%trustSlides.length));
+
+// Trust inview
+inview(document.getElementById('pct-badge'), 0, 0, 220, 22, .9, 1, 0);
+inview(document.getElementById('trust-badge-card'), 24, 120, 200, 26);
+inview(document.getElementById('coach-card'), 60, 0, 170, 26, .92, 1, 0);
+
+// Init trust
+const trustObs = new IntersectionObserver(entries=>{
+  if(!entries[0].isIntersecting) return;
+  trustObs.disconnect();
+  setTrustSlide(0, true);
+}, {threshold:.1});
+trustObs.observe(document.getElementById('trust'));
+
+// ── PROGRAMS INVIEW ───────────────────────────────────────────────
+document.querySelectorAll('.prog-item a').forEach((el,i)=>{
+  el.style.opacity='0'; el.style.transform='translateY(1.625rem)';
+  const obs=new IntersectionObserver(entries=>{
+    if(!entries[0].isIntersecting) return; obs.disconnect();
+    setTimeout(()=>{
+      const sp=createSpring(190,26); sp.setVal(26); sp.setTarget(0);
+      let op=0, lt=performance.now();
+      function animate(now){ const dt=now-lt; lt=now; const y=sp.step(dt); op=Math.min(op+dt/300,1); el.style.opacity=String(op); el.style.transform=`translateY(${y}px)`; if(!sp.isDone()||op<1) requestAnimationFrame(animate); }
+      requestAnimationFrame(animate);
+    }, i*90);
+  },{threshold:.2}); obs.observe(el);
+});
+
+// ── STACKED LINES INVIEW ──────────────────────────────────────────
+function staggerLinesInview(container, stagger=120, delay=0, duration=950){
+  if(!container) return;
+  const inners=container.querySelectorAll('.line-inner');
+  inners.forEach(el=>{ el.style.opacity='0'; el.style.transform='translateY(115%)'; });
+  const obs=new IntersectionObserver(entries=>{
+    if(!entries[0].isIntersecting) return; obs.disconnect();
+    revealLines(container, stagger, delay, duration, easeOutExpo);
+  },{threshold:.2}); obs.observe(container);
+}
+
+staggerLinesInview(document.getElementById('programs-title'));
+staggerLinesInview(document.getElementById('facilities-title'), 120, 0, 950);
+staggerLinesInview(document.getElementById('stats-title'));
+staggerLinesInview(document.getElementById('testimonials-title'));
+staggerLinesInview(document.querySelector('footer .footer-play'));
+
+// ── FACILITIES INVIEW ─────────────────────────────────────────────
+inview(document.getElementById('fac-icon'), 0, 0, 240, 20, .85, 1, 0);
+// facility body word-by-word
+const facBody=document.getElementById('fac-body');
+const facBodyText=facBody.textContent;
+facBody.innerHTML='';
+facBodyText.split(' ').forEach((w,i)=>{
+  const clip=document.createElement('span');
+  clip.style.cssText='display:inline-block;overflow:hidden;padding-bottom:.1em;vertical-align:bottom';
+  const inner=document.createElement('span');
+  inner.style.cssText='display:inline-block;transform:translateY(1.125rem);opacity:0';
+  inner.textContent=w+' ';
+  clip.appendChild(inner); facBody.appendChild(clip);
+});
+const facBodyObs=new IntersectionObserver(entries=>{
+  if(!entries[0].isIntersecting) return; facBodyObs.disconnect();
+  facBody.querySelectorAll('span > span').forEach((inner,i)=>{
+    setTimeout(()=>{ tween(700, easeOutQuart, p=>{ inner.style.transform=`translateY(${18*(1-p)}px)`; inner.style.opacity=String(p); }); }, 250+i*28);
+  });
+},{threshold:.2}); facBodyObs.observe(facBody);
+
+[0,1].forEach(i=>{ inview(document.getElementById(`fac-tile-${i}`), 48, i*140, 180, 26); });
+
+// ── STATS INVIEW ──────────────────────────────────────────────────
+document.querySelectorAll('.stat-cell').forEach((el,i)=>inview(el,30,i*110,180,24));
+
+// ── TESTIMONIALS INVIEW ───────────────────────────────────────────
+document.querySelectorAll('.test-card').forEach((el,i)=>{
+  inview(el, 40, i*120, 180, 26);
+  if(innerWidth>768){
+    el.addEventListener('mouseenter',()=>{ el.style.transition='transform .3s'; el.style.transform='translateY(-8px)'; });
+    el.addEventListener('mouseleave',()=>{ el.style.transform='translateY(0)'; });
+  }
+});
+
+// ── FOOTER CTA BUTTON ─────────────────────────────────────────────
+inview(document.querySelector('.inview-footer-btn'), 20, 150, 200, 24);
+
+// ── MODAL ─────────────────────────────────────────────────────────
+const modalWrap=document.getElementById('modal');
+const modalForm=document.getElementById('modal-form');
+const modalSuccess=document.getElementById('modal-success');
+const modalSubmit=document.getElementById('modal-submit');
+let modalOpen=false;
+
+function openModal(){
+  modalOpen=true; lockScroll();
+  document.body.classList.add('modal-open');
+  revealLines(document.querySelector('#modal .modal-panel > div'), 90, 0, 800, easeOutExpo);
+  setTimeout(()=>document.getElementById('f-name').focus(), 120);
+}
+function closeModal(){
+  modalOpen=false; unlockScroll();
+  document.body.classList.remove('modal-open');
+  setTimeout(()=>{ modalForm.reset(); modalSuccess.style.display='none'; modalSubmit.disabled=false; modalSubmit.textContent='Request a callback'; }, 350);
+}
+document.getElementById('modal-backdrop').addEventListener('click', closeModal);
+document.getElementById('modal-close').addEventListener('click', closeModal);
+document.getElementById('modal-done').addEventListener('click', closeModal);
+[document.getElementById('hdr-book'), document.getElementById('footer-book'), document.getElementById('menu-book')].forEach(b=>{ if(b) b.addEventListener('click',()=>{ closeMenu(); openModal(); }); });
+modalForm.addEventListener('submit', e=>{
+  e.preventDefault();
+  modalSubmit.disabled=true; modalSubmit.textContent='Sending…';
+  setTimeout(()=>{
+    const name = document.getElementById('f-name').value.trim().split(' ')[0]||'there';
+    document.getElementById('success-msg').textContent=`Thanks, ${name} — our team will be in touch to plan your campaign.`;
+    modalSuccess.style.display='block';
+  }, 1200);
+});
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ if(modalOpen) closeModal(); else if(menuOpen) closeMenu(); } });
+
+// ── MENU ──────────────────────────────────────────────────────────
+const menuWrap=document.getElementById('menu');
+let menuOpen=false;
+
+function openMenu(){
+  menuOpen=true; lockScroll();
+  document.body.classList.add('menu-open');
+  document.querySelectorAll('.menu-link').forEach((el,i)=>{
+    el.style.opacity='0'; el.style.transform='translateY(1.75rem)';
+    const sp=createSpring(200,26); sp.setVal(28); sp.setTarget(0);
+    let op=0, lt=performance.now();
+    setTimeout(()=>{
+      function animate(now){ const dt=now-lt; lt=now; const y=sp.step(dt); op=Math.min(op+dt/250,1); el.style.opacity=String(op); el.style.transform=`translateY(${y}px)`; if(!sp.isDone()||op<1) requestAnimationFrame(animate); }
+      requestAnimationFrame(animate);
+    }, 120+i*70);
+  });
+}
+function closeMenu(){
+  menuOpen=false; unlockScroll();
+  document.body.classList.remove('menu-open');
+}
+document.getElementById('burger-btn').addEventListener('click', openMenu);
+document.getElementById('menu-close').addEventListener('click', closeMenu);
+document.getElementById('menu-backdrop').addEventListener('click', closeMenu);
+document.querySelectorAll('[data-menu-link]').forEach(el=>{
+  el.addEventListener('click', e=>{
+    e.preventDefault();
+    const href=el.getAttribute('href');
+    closeMenu();
+    setTimeout(()=>{ const t=document.querySelector(href); if(t) lenis.scrollTo(t, {duration:1.2}); }, 300);
+  });
+});
+
+// ── SMOOTH-SCROLL ANCHORS ─────────────────────────────────────────
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click', e=>{
+    const t=document.querySelector(a.getAttribute('href'));
+    if(!t) return;
+    e.preventDefault();
+    lenis.scrollTo(t, {duration:1.2});
+  });
+});
+</script>
+</body>
+</html>

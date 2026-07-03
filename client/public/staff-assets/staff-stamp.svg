@@ -1,0 +1,6 @@
+<svg width="180" height="110" viewBox="0 0 180 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="2" y="2" width="176" height="106" rx="14" fill="#F1F5F9" stroke="#0F172A" stroke-width="4"/>
+  <text x="50%" y="35" dominant-baseline="middle" text-anchor="middle" fill="#0F172A" font-family="Arial, sans-serif" font-size="16" font-weight="700">STAFF STAMP</text>
+  <line x1="20" y1="76" x2="160" y2="76" stroke="#0F172A" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="50%" y="94" dominant-baseline="middle" text-anchor="middle" fill="#0F172A" font-family="Arial, sans-serif" font-size="12">Authorized</text>
+</svg>

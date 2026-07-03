@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 160" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <style>
+      .signature { font-family: 'Pacifico', cursive; font-size: 72px; fill: none; stroke: #1f2937; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+  </defs>
+  <path class="signature" d="M24 96c16-18 32-36 54-40 18-3 30 7 38 24 14 28 38 44 66 38 24-5 42-28 56-50 6-10 14-23 25-26 10-3 21 2 30 9 10 8 16 20 26 28 10 8 20 10 32 6 18-7 29-25 40-42 14-20 32-34 56-32 12 1 21 9 29 18 13 16 19 35 28 52"/>
+  <path class="signature" d="M24 120c24-5 46-23 72-22 28 1 52 21 74 9 10-6 16-16 29-18 16-2 30 10 45 14 24 6 47-7 71-8 23-1 40 16 61 18 24 2 49-14 74-14"/>
+  <text x="50%" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#475569">Amit Advertising</text>
+</svg>
