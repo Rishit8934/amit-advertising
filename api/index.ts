@@ -1,17 +1,17 @@
-import express, { type Request, Response, NextFunction } from "express";
-import { createServer } from "http";
-import { registerRoutes } from "../server/routes";
+import express from "express";
+import { db } from "../server/db";
+import { newspapers } from "../shared/schema";
 
 const app = express();
-const httpServer = createServer(app);
-
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 
-registerRoutes(httpServer, app);
-
-app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-  res.status(err.status || 500).json({ message: err.message || "Internal Server Error" });
+app.get("/api/newspapers", async (_req, res) => {
+  try {
+    const rows = await db.select().from(newspapers).limit(5);
+    res.json(rows);
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 export default app;
