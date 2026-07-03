@@ -14,10 +14,15 @@ function hashPassword(password: string): string {
 }
 
 // Configure multer for file uploads
-const uploadDir = path.join(process.cwd(), "attached_assets", "rate_cards");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+// Use /tmp in serverless environments (Vercel), local path otherwise
+const uploadDir = process.env.VERCEL
+  ? "/tmp/rate_cards"
+  : path.join(process.cwd(), "attached_assets", "rate_cards");
+try {
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+} catch { /* read-only filesystem in serverless — uploads won't persist but won't crash */ }
 
 const storageConfig = multer.diskStorage({
   destination: (req, file, cb) => {
