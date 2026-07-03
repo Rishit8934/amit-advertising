@@ -1,7 +1,12 @@
-import type { IncomingMessage, ServerResponse } from "http";
+import express from "express";
 
-export default function handler(req: IncomingMessage, res: ServerResponse) {
-  (res as any).setHeader("Content-Type", "application/json");
-  (res as any).statusCode = 200;
-  (res as any).end(JSON.stringify([{ id: "1", name: "Raw handler works!" }]));
-}
+const app = express();
+app.use(express.json());
+
+app.get("/api/newspapers", (_req, res) => {
+  res.json([{ id: "1", name: "Express works on Vercel!" }]);
+});
+
+app.get("/api/ping", (_req, res) => res.json({ ok: true }));
+
+export default app;
