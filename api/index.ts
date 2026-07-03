@@ -1,28 +1,33 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { createServer } from "http";
-import { registerRoutes } from "../server/routes";
 
-const app = express();
-const httpServer = createServer(app);
+let app: express.Express | null = null;
+let initError: string | null = null;
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+function getApp() {
+  if (app) return app;
+  if (initError) return null;
+  try {
+    const { registerRoutes } = require("../server/routes");
+    const instance = express();
+    const httpServer = createServer(instance);
+    instance.use(express.json());
+    instance.use(express.urlencoded({ extended: false }));
+    registerRoutes(httpServer, instance);
+    instance.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      res.status(err.status || 500).json({ message: err.message || "Internal Server Error" });
+    });
+    app = instance;
+  } catch (e: any) {
+    initError = e.message + "\n" + e.stack;
+  }
+  return app;
+}
 
-app.use((req, res, next) => {
-  const start = Date.now();
-  res.on("finish", () => {
-    if (req.path.startsWith("/api")) {
-      console.log(`${req.method} ${req.path} ${res.statusCode} in ${Date.now() - start}ms`);
-    }
-  });
-  next();
-});
-
-registerRoutes(httpServer, app);
-
-app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-  const status = err.status || err.statusCode || 500;
-  res.status(status).json({ message: err.message || "Internal Server Error" });
-});
-
-export default app;
+export default function handler(req: Request, res: Response) {
+  const instance = getApp();
+  if (!instance) {
+    return res.status(500).json({ error: "App failed to initialize", detail: initError });
+  }
+  instance(req, res);
+}
