@@ -1,3 +1,6 @@
+import { config } from "dotenv";
+config({ path: ".env.local" }); // no-op on Vercel; loads local env for dev
+
 import { drizzle } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
 import * as schema from "../shared/schema";

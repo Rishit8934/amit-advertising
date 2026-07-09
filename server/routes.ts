@@ -24,33 +24,29 @@ try {
   }
 } catch { /* read-only filesystem in serverless — uploads won't persist but won't crash */ }
 
-const storageConfig = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = `${randomUUID()}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
-  }
-});
-
-const upload = multer({
-  storage: storageConfig,
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit
-  },
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|pdf/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
-
-    if (mimetype && extname) {
-      return cb(null, true);
-    } else {
-      cb(new Error("Only image files (JPEG, PNG) and PDF files are allowed"));
+function getUpload() {
+  const storageConfig = multer.diskStorage({
+    destination: (_req, _file, cb) => {
+      cb(null, uploadDir);
+    },
+    filename: (_req, file, cb) => {
+      const uniqueName = `${randomUUID()}${path.extname(file.originalname)}`;
+      cb(null, uniqueName);
     }
-  }
-});
+  });
+  return multer({
+    storage: storageConfig,
+    limits: { fileSize: 10 * 1024 * 1024 },
+    fileFilter: (_req, file, cb) => {
+      const allowedTypes = /jpeg|jpg|png|pdf/;
+      if (allowedTypes.test(path.extname(file.originalname).toLowerCase()) && allowedTypes.test(file.mimetype)) {
+        cb(null, true);
+      } else {
+        cb(new Error("Only JPEG, PNG or PDF files are allowed"));
+      }
+    }
+  });
+}
 
 // Sample rate data for cost calculator
 const RATE_DATA = {
@@ -2839,7 +2835,7 @@ export function registerRoutes(
   });
 
   // POST /api/staff/rate-cards - Upload rate card image
-  app.post("/api/staff/rate-cards", requireStaffAuth, upload.single("image"), (req, res) => {
+  app.post("/api/staff/rate-cards", requireStaffAuth, getUpload().single("image"), (req, res) => {
     const { newspaperId, imageName } = req.body;
 
     if (!newspaperId) {
