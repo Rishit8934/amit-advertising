@@ -2,6 +2,7 @@
   "name": "rest-express",
   "version": "1.0.0",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "dev": "npx tsx server/index.ts",
     "build": "npx vite build",
