@@ -17,7 +17,8 @@ app.get("/api/newspapers", async (_req, res) => {
     const newspapers = await db.select().from(schema.newspapers).where(eq(schema.newspapers.active, true));
     res.json(newspapers);
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    // Return 200 temporarily so we can read the error body (WebFetch hides 500 bodies)
+    res.json({ DEBUG_ERROR: err.message, stack: err.stack?.split("\n").slice(0, 4) });
   }
 });
 
