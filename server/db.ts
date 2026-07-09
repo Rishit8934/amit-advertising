@@ -1,5 +1,5 @@
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
+import pg from "pg";
+import { drizzle } from "drizzle-orm/node-postgres";
 import * as schema from "../shared/schema";
 import { config as dotenvConfig } from "dotenv";
 
@@ -10,7 +10,10 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL environment variable is not set");
 }
 
-const sql = neon(process.env.DATABASE_URL);
-// drizzle({ client: sql }) uses the new unified API which calls sql as a tagged template,
-// avoiding the @neondatabase/serverless v1.x "not a tagged-template" runtime error.
-export const db = drizzle({ client: sql, schema });
+const pool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+  max: 3,
+});
+
+export const db = drizzle(pool, { schema });
