@@ -1,31 +1,41 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { createServer } from "http";
+// Diagnose: import ONLY the db chain (pg + drizzle + schema) without routes.ts
+// This will show if pg causes the crash or if it's something in routes.ts
+import { db } from "../server/db";
+import * as schema from "../shared/schema";
+import { eq } from "drizzle-orm";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Health check registered FIRST — works even if route chain crashes
 app.get("/api/ping", (_req, res) => res.json({ pong: true, time: Date.now() }));
 
-let initError: string | null = null;
+app.get("/api/newspapers", async (_req, res) => {
+  try {
+    const newspapers = await db.select().from(schema.newspapers).where(eq(schema.newspapers.active, true));
+    res.json(newspapers);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-// Dynamic import defers route loading to after the module body starts.
-// This means: even if routes.ts or its imports crash, /api/ping above still works.
-// It also lets us catch and surface the exact crash message at /api/debug.
-try {
-  const { registerRoutes } = await import("../server/routes");
-  const httpServer = createServer(app);
-  registerRoutes(httpServer, app);
-} catch (err) {
-  initError = err instanceof Error
-    ? `${err.name}: ${err.message}\n${err.stack?.split("\n").slice(0, 6).join("\n")}`
-    : String(err);
-  console.error("Route init failed:", initError);
-}
-
-// Exposes the init error so we can diagnose Vercel crashes remotely
-app.get("/api/debug", (_req, res) => res.json({ initError }));
+app.post("/api/staff/login", async (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) return res.status(400).json({ error: "Missing credentials" });
+  try {
+    const crypto = await import("crypto");
+    const hash = crypto.createHash("sha256").update(password).digest("hex");
+    const staff = await db.select().from(schema.staff).where(eq(schema.staff.username, username));
+    if (!staff[0] || staff[0].password !== hash) return res.status(401).json({ error: "Invalid credentials" });
+    const { randomUUID } = crypto;
+    const sessionToken = randomUUID();
+    res.json({ sessionToken, staff: { id: staff[0].id, username: staff[0].username, role: staff[0].role } });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   res.status(err.status || 500).json({ message: err.message || "Internal Server Error" });
