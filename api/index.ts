@@ -1,8 +1,9 @@
 import express from "express";
 import pg from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
-// Binary search: test pg + drizzle-orm/node-postgres WITHOUT schema
-// If /api/ping works → drizzle import is fine, crash is from schema.ts chain
+import * as schema from "../shared/schema";
+// Binary search: adding schema.ts (imports drizzle-orm/pg-core + drizzle-zod)
+// If /api/ping crashes → schema.ts chain contains the crash
 
 const app = express();
 app.use(express.json());
@@ -13,16 +14,17 @@ const pool = new pg.Pool({
   max: 1,
   connectionTimeoutMillis: 5000,
 });
-const db = drizzle(pool);
+const db = drizzle(pool, { schema });
 
-app.get("/api/ping", (_req, res) => res.json({ pong: true, drizzleLoaded: true, time: Date.now() }));
+app.get("/api/ping", (_req, res) => res.json({ pong: true, schemaLoaded: true, tables: Object.keys(schema).length, time: Date.now() }));
 
-app.get("/api/test-db", async (_req, res) => {
+app.get("/api/newspapers", async (_req, res) => {
   try {
-    const result = await pool.query("SELECT count(*) FROM newspapers");
-    res.json({ ok: true, count: result.rows[0].count });
+    const { eq } = await import("drizzle-orm");
+    const newspapers = await db.select().from(schema.newspapers).where(eq(schema.newspapers.active, true));
+    res.json(newspapers);
   } catch (err: any) {
-    res.json({ ok: false, error: err.message });
+    res.json({ error: err.message });
   }
 });
 
