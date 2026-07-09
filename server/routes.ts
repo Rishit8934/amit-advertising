@@ -119,13 +119,13 @@ export function registerRoutes(
       return res.status(400).json({ error: "Email and password required" });
     }
 
+    try {
     // Check if user exists
     const existing = await storage.getUserByUsername(email);
     if (existing) {
       return res.status(409).json({ error: "User already exists" });
     }
 
-    try {
       const user = await storage.createUser({
         username: email,
         password: hashPassword(password),
@@ -149,22 +149,20 @@ export function registerRoutes(
       return res.status(400).json({ error: "Email and password required" });
     }
 
-    const user = await storage.getUserByUsername(email);
-    if (!user || user.password !== hashPassword(password)) {
-      return res.status(401).json({ error: "Invalid credentials" });
+    try {
+      const user = await storage.getUserByUsername(email);
+      if (!user || user.password !== hashPassword(password)) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+
+      const sessionToken = randomUUID();
+      sessions.set(sessionToken, { userId: user.id, email });
+
+      res.json({ sessionToken, user: { id: user.id, email: user.username } });
+    } catch (error) {
+      console.error("User login error:", error);
+      res.status(500).json({ error: "Login failed. Please try again." });
     }
-
-    const sessionToken = randomUUID();
-    sessions.set(sessionToken, { userId: user.id, email });
-
-    // Record this login for staff visibility (optional, don't block on failure)
-    // try {
-    //   await storage.createStaffLogin({ userEmail: email, userId: user.id });
-    // } catch (err) {
-    //   console.error("Failed to record login:", err);
-    // }
-
-    res.json({ sessionToken, user: { id: user.id, email: user.username } });
   });
 
   // POST /api/staff/login
@@ -175,23 +173,28 @@ export function registerRoutes(
       return res.status(400).json({ error: "Username and password required" });
     }
 
-    const staff = await storage.getStaffByUsername(username);
-    if (!staff || staff.password !== hashPassword(password)) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
-
-    const sessionToken = randomUUID();
-    const admin = staff.role === "admin" || isStaffAdminEmail(staff.username);
-    sessions.set(sessionToken, { userId: staff.id, email: staff.username, role: admin ? "admin" : staff.role });
-
-    res.json({
-      sessionToken,
-      staff: {
-        id: staff.id,
-        username: staff.username,
-        role: admin ? "admin" : staff.role
+    try {
+      const staff = await storage.getStaffByUsername(username);
+      if (!staff || staff.password !== hashPassword(password)) {
+        return res.status(401).json({ error: "Invalid credentials" });
       }
-    });
+
+      const sessionToken = randomUUID();
+      const admin = staff.role === "admin" || isStaffAdminEmail(staff.username);
+      sessions.set(sessionToken, { userId: staff.id, email: staff.username, role: admin ? "admin" : staff.role });
+
+      res.json({
+        sessionToken,
+        staff: {
+          id: staff.id,
+          username: staff.username,
+          role: admin ? "admin" : staff.role
+        }
+      });
+    } catch (error) {
+      console.error("Staff login error:", error);
+      res.status(500).json({ error: "Login failed. Please try again." });
+    }
   });
 
   // POST /api/staff/logout
